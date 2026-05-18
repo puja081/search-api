@@ -12,17 +12,19 @@ public class DocumentResponse {
     private Long id;
     private String title;
     private String content;
-    private String tags;
+    private String tag;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public DocumentResponse() {}
-    public DocumentResponse(Long id, String title, String content, String tags, LocalDateTime createdAt) {
+
+    public DocumentResponse(Long id, String title, String content, String tag,
+                            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.tags = tags;
+        this.tag = tag;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-
-
 }
