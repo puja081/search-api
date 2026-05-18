@@ -60,11 +60,17 @@ public class DocumentController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<DocumentResponse>> search(
-            @RequestParam String q,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String tag,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(documentService.search(q, pageable));
+        Sort sort = direction.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(documentService.search(q, tag, pageable));
     }
 }

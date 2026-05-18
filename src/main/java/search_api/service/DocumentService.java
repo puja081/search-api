@@ -54,8 +54,8 @@ public class DocumentService {
         documentRepository.deleteById(id);
     }
 
-    public Page<DocumentResponse> search(String keyword, Pageable pageable) {
-        return documentRepository.searchByKeyword(keyword, pageable).map(this::toResponse);
+    public Page<DocumentResponse> search(String keyword, String tag, Pageable pageable) {
+        return documentRepository.searchWithFilters(keyword, tag, pageable).map(this::toResponse);
     }
 
     private DocumentResponse toResponse(Document document) {
