@@ -15,9 +15,11 @@ import search_api.repository.DocumentRepository;
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final SearchTracker searchTracker;
 
-    public DocumentService(DocumentRepository documentRepository) {
+    public DocumentService(DocumentRepository documentRepository, SearchTracker searchTracker) {
         this.documentRepository = documentRepository;
+        this.searchTracker = searchTracker;
     }
 
     public DocumentResponse create(DocumentRequest request) {
@@ -55,6 +57,9 @@ public class DocumentService {
     }
 
     public Page<DocumentResponse> search(String keyword, String tag, Pageable pageable) {
+        if (keyword != null && !keyword.isBlank()) {
+            searchTracker.record(keyword);
+        }
         return documentRepository.searchWithFilters(keyword, tag, pageable).map(this::toResponse);
     }
 

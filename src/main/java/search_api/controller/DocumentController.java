@@ -11,15 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import search_api.dto.DocumentRequest;
 import search_api.dto.DocumentResponse;
 import search_api.service.DocumentService;
+import search_api.service.SearchTracker;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final SearchTracker searchTracker;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(DocumentService documentService, SearchTracker searchTracker) {
         this.documentService = documentService;
+        this.searchTracker = searchTracker;
     }
 
     @PostMapping("/documents")
@@ -56,6 +62,12 @@ public class DocumentController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         documentService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search/top")
+    public ResponseEntity<List<Map<String, Object>>> topSearches(
+            @RequestParam(defaultValue = "10") int k) {
+        return ResponseEntity.ok(searchTracker.getTopK(k));
     }
 
     @GetMapping("/search")
