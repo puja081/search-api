@@ -1,32 +1,29 @@
 package search_api.service;
 
-import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import search_api.dto.DocumentRequest;
 import search_api.dto.DocumentResponse;
 import search_api.exception.ResourceNotFoundException;
 import search_api.model.Document;
 import search_api.repository.DocumentRepository;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class DocumentService {
 
     private final DocumentRepository documentRepository;
-    private final SearchTracker searchTracker;
 
-    public DocumentService(DocumentRepository documentRepository, SearchTracker searchTracker) {
+    public DocumentService(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
-        this.searchTracker = searchTracker;
     }
 
     public DocumentResponse create(DocumentRequest request) {
         Document document = new Document();
         document.setTitle(request.getTitle());
         document.setContent(request.getContent());
-        document.setTag(request.getTag());
         return toResponse(documentRepository.save(document));
     }
 
@@ -36,8 +33,8 @@ public class DocumentService {
         return toResponse(document);
     }
 
-    public Page<DocumentResponse> getAll(Pageable pageable) {
-        return documentRepository.findAll(pageable).map(this::toResponse);
+    public List<DocumentResponse> getAll() {
+        return documentRepository.findAll().stream().map(this::toResponse).toList();
     }
 
     public DocumentResponse update(Long id, DocumentRequest request) {
@@ -45,7 +42,6 @@ public class DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + id));
         document.setTitle(request.getTitle());
         document.setContent(request.getContent());
-        document.setTag(request.getTag());
         return toResponse(documentRepository.save(document));
     }
 
@@ -56,19 +52,11 @@ public class DocumentService {
         documentRepository.deleteById(id);
     }
 
-    public Page<DocumentResponse> search(String keyword, String tag, Pageable pageable) {
-        if (keyword != null && !keyword.isBlank()) {
-            searchTracker.record(keyword);
-        }
-        return documentRepository.searchWithFilters(keyword, tag, pageable).map(this::toResponse);
-    }
-
     private DocumentResponse toResponse(Document document) {
         return new DocumentResponse(
                 document.getId(),
                 document.getTitle(),
                 document.getContent(),
-                document.getTag(),
                 document.getCreatedAt(),
                 document.getUpdatedAt()
         );

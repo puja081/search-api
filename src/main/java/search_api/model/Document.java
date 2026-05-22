@@ -6,8 +6,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@Setter
 @Entity
 @Table(name = "documents")
 public class Document {
@@ -21,8 +21,6 @@ public class Document {
 
     @Column(columnDefinition = "TEXT")
     private String content;
-
-    private String tag;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
